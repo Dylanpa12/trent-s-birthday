@@ -119,6 +119,7 @@ body::before {
     margin-top: 15px;
 }
 
+/* ⭐ BUTTON WITH ARROW FIX */
 .btn {
     margin-top: 30px;
     padding: 14px 28px;
@@ -129,9 +130,15 @@ body::before {
     background: linear-gradient(90deg, #ff4fd8, #ffcc33);
     color: #0b0b0f;
     box-shadow: 0 0 25px rgba(255,79,216,0.6);
+
+    display: inline-flex;
+    align-items: center;   /* centers arrow vertically */
+    justify-content: center;
+    gap: 10px;
+    line-height: 1;        /* removes baseline sag */
 }
 
-/* ⭐ AUTO‑FIT VI LOGO BACKGROUND FOR SCENE 2 */
+/* ⭐ ORIGINAL AUTO‑FIT VI LOGO BACKGROUND */
 #scene2 {
     background-image: url('vi.png'); /* ← your new image */
     background-size: contain;
@@ -140,7 +147,7 @@ body::before {
     background-attachment: fixed;
 }
 
-/* ⭐ READABILITY FIX — DARK OVERLAY + TEXT SHADOW */
+/* ⭐ READABILITY FIX */
 #scene2::before {
     content: "";
     position: absolute;
