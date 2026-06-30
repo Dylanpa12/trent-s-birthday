@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vice City Transmission</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    color: white;
+
+    background: radial-gradient(circle at 50% 30%, #ff4fd8 0%, transparent 40%),
+                radial-gradient(circle at 70% 60%, #ffcc33 0%, transparent 45%),
+                linear-gradient(180deg, #120018, #05050a);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 0;
+}
+
+.bar {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 12vh;
+    background: black;
+    z-index: 1000;
+}
+.top { top: 0; }
+.bottom { bottom: 0; }
+
+.scene {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    z-index: 5;
+    transform: scale(1.2);
+    opacity: 0;
+}
+
+.zoom-in {
+    animation: zoomIn 2s ease forwards;
+}
+
+@keyframes zoomIn {
+    0% { transform: scale(1.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.loader-wrap {
+    width: 80%;
+    max-width: 500px;
+    margin-top: 25px;
+    background: #1a1a1f;
+    border-radius: 50px;
+    height: 16px;
+    overflow: hidden;
+}
+
+.loader {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff4fd8, #ffcc33);
+}
+
+.percent {
+    margin-top: 10px;
+    opacity: 0.8;
+}
+
+.logbox {
+    margin-top: 20px;
+    width: 80%;
+    max-width: 520px;
+    height: 40px;
+    overflow: hidden;
+    position: relative;
+}
+
+.wheel {
+    position: absolute;
+    width: 100%;
+    transition: transform 0.6s ease;
+}
+
+.wheel-item {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.25;
+    transform: scale(0.9);
+    transition: all 0.6s ease;
+}
+
+.wheel-item.active {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.big { font-size: 2rem; }
+.sub { opacity: 0.7; margin-top: 10px; }
+
+.countdown {
+    font-size: 1.6rem;
+    margin-top: 15px;
+}
+
+/* ⭐ BUTTON WITH PERFECT ARROW CENTERING */
+.btn {
+    margin-top: 30px;
+    padding: 14px 28px;
+    font-weight: bold;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(90deg, #ff4fd8, #ffcc33);
+    color: #0b0b0f;
+    box-shadow: 0 0 25px rgba(255,79,216,0.6);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ⭐ BIGGER + BLENDED VI LOGO */
+#scene2 {
+    background-image: url('vi.png');
+    background-size: 115%;     /* ⭐ Bigger VI logo */
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0.90;
+    filter: drop-shadow(0 0 40px rgba(0,0,0,0.6));
+}
+
+/* ⭐ READABILITY FIX */
+#scene2::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: -1;
+}
+
+#scene2 .big,
+#scene2 .sub,
+#scene2 .countdown {
+    text-shadow: 0 0 12px black;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bar top"></div>
+<div class="bar bottom"></div>
+
+<!-- ⭐ MP3 AUDIO PLAYER -->
+<audio id="music" autoplay loop>
+    <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<!-- SCENE 1 -->
+<div id="scene1" class="scene zoom-in">
+
+    <div class="big">Happy Birthday Trent 🎉</div>
+    <div class="sub">Installing GTA 6 Ultimate Edition</div>
+
+    <div class="loader-wrap">
+        <div class="loader" id="loader"></div>
+    </div>
+
+    <div class="percent" id="percent">0%</div>
+
+    <div class="logbox">
+        <div id="wheel" class="wheel"></div>
+    </div>
+</div>
+
+<!-- SCENE 2 -->
+<div id="scene2" class="scene">
+    <div class="big">Pre-Order Confirmed</div>
+    <div>The Future of GTA Starts Here</div>
+
+    <div class="countdown" id="countdown"></div>
+
+    <div class="sub" style="margin-top:20px;">
+        Your Ultimate Edition is secured.<br>
+        See you on launch day.
+    </div>
+
+    <button class="btn"
+        onclick="window.open('https://www.rockstargames.com/VI','_blank')">
+        NEXT STOP → VICE CITY →
+    </button>
+</div>
+
+<script>
+
+/* 🎮 PHASED WHEEL DATA */
+const phaseAssets = [
+    ["Initialising core systems", "Booting render engine", "Allocating memory pools"],
+    ["Loading world assets", "Streaming city geometry", "Building environment layers"],
+    ["Loading gameplay systems", "Character framework online", "Vehicle physics initialised"],
+    ["Building simulation layer", "AI traffic systems active", "World population syncing"],
+    ["Finalising experience", "Audio systems locking in", "Optimisation complete"]
+];
+
+let currentPhase = 0;
+let wheelIndex = 0;
+
+const loader = document.getElementById("loader");
+const percent = document.getElementById("percent");
+const wheel = document.getElementById("wheel");
+
+function renderWheel() {
+    wheel.innerHTML = "";
+
+    phaseAssets[currentPhase].forEach((item, i) => {
+        const div = document.createElement("div");
+        div.className = "wheel-item" + (i === wheelIndex ? " active" : "");
+        div.innerText = "Loading assets: " + item;
+        wheel.appendChild(div);
+    });
+
+    wheel.style.transform = `translateY(${-wheelIndex * 40}px)`;
+}
+
+const duration = 20000;
+const startTime = Date.now();
+
+const interval = setInterval(() => {
+
+    const elapsed = Date.now() - startTime;
+    let progress = (elapsed / duration) * 100;
+
+    if (progress > 100) progress = 100;
+
+    loader.style.width = progress + "%";
+    percent.innerText = Math.floor(progress) + "%";
+
+    const newPhase = Math.floor(progress / 20);
+
+    if (newPhase !== currentPhase) {
+        currentPhase = newPhase;
+        if (currentPhase > phaseAssets.length - 1)
+            currentPhase = phaseAssets.length - 1;
+
+        wheelIndex = 0;
+        renderWheel();
+    }
+
+    const newWheel = Math.floor(elapsed / 2000) % phaseAssets[currentPhase].length;
+
+    if (newWheel !== wheelIndex) {
+        wheelIndex = newWheel;
+        renderWheel();
+    }
+
+    if (progress >= 100) {
+        clearInterval(interval);
+        transition();
+    }
+
+}, 50);
+
+function transition() {
+    document.getElementById("scene1").style.display = "none";
+    document.getElementById("scene2").classList.add("zoom-in");
+
+    startCountdown();
+}
+
+const target = new Date("November 19, 2026 00:00:00").getTime();
+
+function startCountdown() {
+    setInterval(() => {
+        const now = Date.now();
+        const diff = target - now;
+
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor(diff % 86400000 / 3600000);
+        const m = Math.floor(diff % 3600000 / 60000);
+        const s = Math.floor(diff % 60000 / 1000);
+
+        document.getElementById("countdown").innerText =
+        `${d}d ${h}h ${m}m ${s}s`;
+    }, 1000);
+}
+
+</script>
+
+</body>
+</html>
